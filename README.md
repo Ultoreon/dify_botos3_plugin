@@ -112,3 +112,26 @@ Keep both `version` and `meta.version` in sync.
 - Add a CHANGELOG.md to track feature additions (download tools added in 0.0.3+).
 - Consider semantic versioning: increment patch for fixes, minor for new tools, major for breaking changes.
 
+### Release Troubleshooting
+
+If a platform (e.g. Dify) reports "No releases found":
+
+1. Confirm a GitHub Release exists under the repository's Releases tab (not just a tag). The workflow creates one automatically when a tag is pushed.
+2. Ensure the tag name matches pattern `v<version>` (e.g. `v0.0.4`).
+3. Verify `manifest.yaml` has the same version (`version` and `meta.version`). Mismatch can lead to confusion—though the zip will still build.
+4. Check workflow run succeeded (Actions tab). If it failed before the release step, fix and re-push the tag (delete tag locally and remotely if needed).
+5. Permissions: The workflow now declares `permissions: contents: write`. Without that, release creation can silently fail.
+6. Artifact path: Confirm `dist/botos3-<version>.zip` exists in the workflow summary.
+
+Re-tag after fixing manifest mismatch:
+
+```powershell
+git tag -d v0.0.4
+git push origin :refs/tags/v0.0.4
+git add manifest.yaml
+git commit -m "chore: bump version to 0.0.4"
+git tag v0.0.4
+git push origin v0.0.4
+```
+
+

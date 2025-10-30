@@ -1,4 +1,4 @@
-version: 0.0.3
+version: 0.0.4
 type: plugin
 author: datoujiejie
 name: botos3
@@ -25,7 +25,7 @@ plugins:
   tools:
     - provider/botos3.yaml
 meta:
-  version: 0.0.3
+  version: 0.0.4
   arch:
     - amd64
     - arm64
