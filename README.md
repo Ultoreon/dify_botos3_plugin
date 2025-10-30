@@ -54,3 +54,59 @@ Created by [datoujiejie](https://github.com/datoujiejie)
 
 
 https://github.com/datoujiejie/dify-botos3-plugin
+
+## Distribution / Export
+
+### Manual Packaging
+
+Run the packaging script to build a distributable zip (includes manifest and tool definitions):
+
+```powershell
+python build_package.py
+```
+
+The archive will appear under `dist/` as `botos3-<version>.zip`. (Version taken from `manifest.yaml`). Upload this zip in the Dify Marketplace submission flow or distribute internally.
+
+### Automatic GitHub Release
+
+This repository contains a GitHub Actions workflow at `.github/workflows/release-plugin.yml` which triggers on pushing a tag starting with `v` (e.g. `v0.0.4`). It:
+
+1. Checks out code
+2. Installs dependencies (if any in `requirements.txt`)
+3. Runs `python build_package.py`
+4. Uploads the zip as a build artifact
+5. Publishes a GitHub Release attaching the packaged zip
+
+To create a release:
+
+```powershell
+git tag v0.0.4
+git push origin v0.0.4
+```
+
+Ensure you also bump the version field in `manifest.yaml` before tagging so the zip name aligns with the release tag.
+
+### Updating Version
+
+Edit `manifest.yaml` and change:
+
+```yaml
+version: 0.0.X
+meta:
+version: 0.0.X
+```
+
+Keep both `version` and `meta.version` in sync.
+
+### Marketplace Notes
+
+- Include `PRIVACY.md` content before publishing.
+- Make sure icon file (`icon.svg`) is present.
+- Keep your provider credentials description clear for end users.
+
+### Recommended Next Steps
+
+- Add unit tests (if feasible) before release.
+- Add a CHANGELOG.md to track feature additions (download tools added in 0.0.3+).
+- Consider semantic versioning: increment patch for fixes, minor for new tools, major for breaking changes.
+
