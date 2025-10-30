@@ -1,13 +1,13 @@
 version: 0.0.4
 type: plugin
-author: datoujiejie
-name: botos3
+author: lmarien
+name: botos3v2
 label:
-  en_US: botos3
-  zh_Hans: botos3
+  en_US: botos3v2
+  zh_Hans: botos3v2
 description:
-  en_US: upload file by boto s3
-  zh_Hans: 通过s3库上传文件
+  en_US: upload/load file by boto s3
+  zh_Hans: 通过s3库上传/下载文件
 icon: icon.svg
 resource:
   memory: 268435456

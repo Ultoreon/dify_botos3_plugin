@@ -1,0 +1,7 @@
+credentials:
+  # Removed obsolete DIFY_ENDPOINT credential.
+  # ...existing code (retain S3 access key, secret, region, endpoint, bucket, etc.)...
+  # Example:
+  # - key: S3_ENDPOINT
+  #   type: text
+  #   required: false

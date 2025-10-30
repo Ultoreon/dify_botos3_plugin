@@ -23,7 +23,7 @@ parameters:
     form: llm
   - name: s3_key
     type: string
-    required: true
+    required: false
     label:
       en_US: S3 Object key
       zh_Hans: s3对象key
@@ -31,6 +31,39 @@ parameters:
       en_US: S3 Object key
       zh_Hans: s3对象key
     llm_description: S3 Object key
+    form: llm
+  - name: filename
+    type: string
+    required: false
+    label:
+      en_US: Filename (alternative key)
+      zh_Hans: 文件名（备用 key）
+    human_description:
+      en_US: If s3_key not provided, this filename is used as the object key
+      zh_Hans: 若未提供 s3_key，将使用该文件名作为对象 key
+    llm_description: Optional filename used when s3_key absent
+    form: llm
+  - name: generate_presigned_url
+    type: boolean
+    required: false
+    label:
+      en_US: Generate Presigned URL
+      zh_Hans: 生成预签名链接
+    human_description:
+      en_US: If true, append a presigned URL for the uploaded object
+      zh_Hans: 若为 true，将附加已上传对象的预签名链接
+    llm_description: Set true to also output a presigned URL
+    form: llm
+  - name: presigned_expiration
+    type: number
+    required: false
+    label:
+      en_US: Presigned URL Expiration (seconds)
+      zh_Hans: 预签名链接过期时间（秒）
+    human_description:
+      en_US: Expiration seconds for presigned URL (default 3600)
+      zh_Hans: 预签名链接过期时间（默认 3600 秒）
+    llm_description: Presigned URL expiration seconds
     form: llm
 extra:
   python:

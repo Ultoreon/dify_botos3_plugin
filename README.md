@@ -1,7 +1,7 @@
 # botos3
 
-**Author:** datoujiejie , Ultoreon
-**Version:** 0.0.2
+**Author:**  Ultoreon
+**Version:** 0.0.4
 **Type:** tool
 
 # Description
@@ -26,11 +26,10 @@ This tool allows developers and teams to simplify file management workflows, ens
 
 ### 1. `s3_upload_file`
 
-**Description:** Uploads a specified file to the configured S3 bucket and returns the public URL for the uploaded file.
+**Description:** Uploads a specified file to the configured S3 bucket.
 **Parameters:**
 
-- **File:** The file from dify.
-- **File_URL:**  The file url.
+- **File:** The file from dify. (required)
 - **S3 key:** The key (destination path) for the file in the S3 bucket. (required)
 
 
@@ -45,12 +44,26 @@ If base64 comes from the sandbox, you have to adjust the value of CODE_MAX_STRIN
 - **Base64 string:** The content in base64 format to be uploaded.(required)
 - **S3 key:** The key (destination path) for the object in the S3 bucket.(required)
 
+## Configuration
+
+Replace deprecated DIFY_ENDPOINT with optional S3_ENDPOINT for absolute URL construction.
+
+Required:
+- S3_ACCESS_KEY
+- S3_SECRET_KEY
+- S3_BUCKET
+
+Optional:
+- S3_REGION
+- S3_ENDPOINT (e.g. https://my-s3-compatible-host)
+
+The tool will validate that generated file_url is absolute (http/https).
+
 ## Author
 
+Edited by [Ultoreon](https://github.com/Ultoreon)
 
 Created by [datoujiejie](https://github.com/datoujiejie)
-
-Edited by [Ultoreon](https://github.com/Ultoreon)
 
 ## Repository
 

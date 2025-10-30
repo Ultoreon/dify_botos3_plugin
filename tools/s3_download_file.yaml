@@ -1,6 +1,6 @@
 identity:
   name: s3_download_file
-  author: datoujiejie
+  author: lmarien
   label:
     en_US: Download file from s3
     zh_Hans: 从 S3 下载文件
@@ -42,6 +42,17 @@ parameters:
       en_US: Expiration time in seconds for the temporary URL (default 3600)
       zh_Hans: 临时链接过期时间（默认 3600 秒）
     llm_description: Expiration seconds for pre-signed URL
+    form: llm
+  - name: filename
+    type: string
+    required: false
+    label:
+      en_US: Filename (alternative key)
+      zh_Hans: 文件名（备用 key）
+    human_description:
+      en_US: If s3_key not provided, this filename will be used as the object key
+      zh_Hans: 若未提供 s3_key，将使用该文件名作为对象 key
+    llm_description: Optional filename used when s3_key is absent
     form: llm
 extra:
   python:

@@ -64,19 +64,6 @@ credentials_for_provider:
       zh_Hans: 您的 S3 访问密钥密码
     url: https://boto3.amazonaws.com/v1/documentation/api/latest/guide/credentials.html
 
-  S3_PUBLIC_URL:
-    type: text-input
-    required: true
-    label:
-      en_US: S3 Public URL
-      zh_Hans: S3 公网访问地址
-    placeholder:
-      en_US: Please input your S3 public URL
-      zh_Hans: 请输入你的 S3 公网访问地址
-    help:
-      en_US: The public access URL for your S3 bucket
-      zh_Hans: S3 存储空间的公网访问地址
-    url: https://boto3.amazonaws.com/v1/documentation/api/latest/guide/credentials.html
 
   BUCKET_NAME:
     type: text-input
@@ -91,6 +78,19 @@ credentials_for_provider:
       en_US: The name of your S3 bucket
       zh_Hans: 您的 S3 存储空间名称
     url: https://boto3.amazonaws.com/v1/documentation/api/latest/guide/credentials.html
+  S3_CA_BUNDLE:
+    type: text-input
+    required: false
+    label:
+      en_US: S3 CA Bundle (PEM)
+      zh_Hans: S3 CA 证书链 (PEM)
+    placeholder:
+      en_US: Paste PEM contents if using a private CA
+      zh_Hans: 若使用私有 CA 请粘贴 PEM 内容
+    help:
+      en_US: Optional custom CA bundle for TLS verification.
+      zh_Hans: 可选的自定义 CA 证书用于 TLS 校验。
+    url: https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-ca-bundle.html
 tools:
   - tools/s3_upload_file.yaml
   - tools/s3_upload_base64.yaml

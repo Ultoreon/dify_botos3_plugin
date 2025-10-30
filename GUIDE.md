@@ -1,10 +1,11 @@
-## User Guide of how to develop a Dify Plugin
+# User Guide of how to develop a Dify Plugin
 
 Hi there, looks like you have already created a Plugin, now let's get you started with the development!
 
-### Choose a Plugin type you want to develop
+## Choose a Plugin type you want to develop
 
 Before start, you need some basic knowledge about the Plugin types, Plugin supports to extend the following abilities in Dify:
+
 - **Tool**: Tool Providers like Google Search, Stable Diffusion, etc. it can be used to perform a specific task.
 - **Model**: Model Providers like OpenAI, Anthropic, etc. you can use their models to enhance the AI capabilities.
 - **Endpoint**: Like Service API in Dify and Ingress in Kubernetes, you can extend a http service as an endpoint and control its logics using your own code.
@@ -32,23 +33,23 @@ Now you can edit the `manifest.yaml` file to describe your Plugin, here is the b
   - permission(object)：Permission application
     - tool(object)：Reverse call tool permission
       - enabled (bool)
-    - model(object)：Reverse call model permission
-      - enabled(bool)
-      - llm(bool)
-      - text_embedding(bool)
-      - rerank(bool)
-      - tts(bool)
-      - speech2text(bool)
-      - moderation(bool)
-    - node(object)：Reverse call node permission
-      - enabled(bool) 
-    - endpoint(object)：Allow to register endpoint permission
-      - enabled(bool)
-    - app(object)：Reverse call app permission
-      - enabled(bool)
-    - storage(object)：Apply for persistent storage permission
-      - enabled(bool)
-      - size(int64)：Maximum allowed persistent memory, unit bytes
+  - model(object)：Reverse call model permission
+    - enabled(bool)
+    - llm(bool)
+    - text_embedding(bool)
+    - rerank(bool)
+    - tts(bool)
+    - speech2text(bool)
+    - moderation(bool)
+  - node(object)：Reverse call node permission
+    - enabled(bool)
+  - endpoint(object)：Allow to register endpoint permission
+    - enabled(bool)
+  - app(object)：Reverse call app permission
+    - enabled(bool)
+  - storage(object)：Apply for persistent storage permission
+    - enabled(bool)
+    - size(int64)：Maximum allowed persistent memory, unit bytes
 - plugins(object, required)：Plugin extension specific ability yaml file list, absolute path in the plugin package, if you need to extend the model, you need to define a file like openai.yaml, and fill in the path here, and the file on the path must exist, otherwise the packaging will fail.
   - Format
     - tools(list[string]): Extended tool suppliers, as for the detailed format, please refer to [Tool Guide](https://docs.dify.ai/plugins/schema-definition/tool)
@@ -71,9 +72,11 @@ Now you can edit the `manifest.yaml` file to describe your Plugin, here is the b
 
 - First of all, you need a Python 3.11+ environment, as our SDK requires that.
 - Then, install the dependencies:
-    ```bash
-    pip install -r requirements.txt
-    ```
+
+  ```bash
+  pip install -r requirements.txt
+  ```
+
 - If you want to add more dependencies, you can add them to the `requirements.txt` file, once you have set the runner to python in the `manifest.yaml` file, `requirements.txt` will be automatically generated and used for packaging and deployment.
 
 ### Implement the Plugin
@@ -116,9 +119,9 @@ you will get a `plugin.difypkg` file, that's all, you can submit it to the Marke
 
 Please fill in the privacy policy of the plugin if you want to make it published on the Marketplace, refer to [PRIVACY.md](PRIVACY.md) for more details.
 
-## Added S3 Download Tools
+## S3 Tools Overview
 
-This plugin now provides four S3 related tools:
+This plugin provides four S3-related tools:
 
 1. Upload (binary/file) -> `s3_upload_file`
 2. Upload (base64) -> `s3_upload_base64`
@@ -132,41 +135,95 @@ You must configure the following credentials for the provider (already defined i
 - `DIFY_ENDPOINT`: Base URL of your Dify instance (used to resolve relative file URLs on upload)
 - `S3_ENDPOINT`: S3-compatible service endpoint
 - `S3_ACCESS_KEY` / `S3_SECRET_KEY`: Credentials
-- `S3_PUBLIC_URL`: Public base URL used to compose object URLs (when returning direct URL)
 - `BUCKET_NAME`: Target bucket
 
-### Download Tools Parameters
+### Shared Parameters (Download & Upload)
 
-Both download tools share the same parameters:
+| Parameter | Type | Required | Applies | Description |
+|-----------|------|----------|---------|-------------|
+| `s3_key` | string | No | All | Explicit object key. If absent, `filename` may be used. |
+| `filename` | string | No | All | Fallback key when `s3_key` not provided. Use plain name (optionally with path segments). |
+| `generate_presigned_url` / `generate_presign_url` | boolean | No | All | If true, a presigned URL is appended after the normal output. |
+| `presigned_expiration` / `presign_expiry` | number | No | All | Expiration seconds for presigned URL (default 3600). |
 
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `s3_key` | string | Yes | Object key to download |
-| `generate_presigned_url` | boolean | No | If true, returns a temporary pre-signed URL instead of content |
-| `presigned_expiration` | number | No | Expiration seconds for pre-signed URL (default 3600) |
+Upload-specific:
+
+| Parameter | Type | Required | Tool | Description |
+|-----------|------|----------|------|-------------|
+| `file` | file | Yes | `s3_upload_file` | The binary file from Dify. |
+| `file_base64` | string | Yes | `s3_upload_base64` | Base64-encoded content to upload. |
+
+Download-specific:
+
+| Parameter | Type | Required | Tool | Description |
+|-----------|------|----------|------|-------------|
+| `s3_key` / `filename` | string | One required | Both downloads | Key used to fetch object. |
 
 ### Behavior
 
+`s3_upload_file` / `s3_upload_base64`:
+
+1. Determine object key: `s3_key` > `filename` > error.
+2. Upload content.
+3. Emit confirmation message of successful upload.
+4. If presign flag set, emit second message: `Presigned URL: <url>`.
+
 `s3_download_file`:
 
-- If `generate_presigned_url` is true: returns a single text message containing the pre-signed URL.
-- Else: attempts to return a file message (binary). If that fails, falls back to a composed public URL.
+1. Determine key (same precedence).
+2. Return file binary as first message (or fallback public URL if file message fails).
+3. If presign flag set, emit second message with presigned URL.
 
 `s3_download_base64`:
 
-- If `generate_presigned_url` is true: returns a single text message containing the pre-signed URL.
-- Else: returns base64-encoded content in a text message. Warns when object size > 5MB.
+1. Determine key.
+2. Return base64 content as first message (with size warning if >5MB).
+3. If presign flag set, emit second message with presigned URL.
 
 ### Notes & Best Practices
 
-- Use `generate_presigned_url` when files are large to avoid transferring big payloads through the LLM channel.
-- Ensure `S3_PUBLIC_URL` points to a domain or CDN that can serve your bucket objects (no trailing slash needed; code handles stripping).
-- Base64 download is convenient for small assets (<1–2MB). For larger objects, prefer the file download or pre-signed URL mode.
-- The pre-signed URL uses signature version v4 with the provided expiration.
+- Presigned URL is supplementary now (content always returned first). Use it to share externally or reduce repeated transfers.
+- Consider using only presigned URLs for very large objects (set a size threshold in future enhancements).
+- `filename` simplifies invocation; prefer `s3_key` for full path control (e.g., `reports/2025/summary.pdf`).
+  (Public base URL no longer required; rely on presigned URLs when external sharing is needed.)
+- Expiration defaults to 3600 seconds (1 hour); adjust according to security needs.
+
+### TLS & Custom CA Bundle
+
+If your S3-compatible storage uses an internal certificate authority, provide its PEM chain via the credential `S3_CA_BUNDLE` (added in `provider/botos3.yaml`). Each tool will:
+
+1. Write the PEM contents to a temporary `.pem` file.
+2. Pass its path to `boto3` as the `verify` parameter.
+3. Fall back to system trust store if no bundle is supplied or temp file write fails.
+
+You should NOT disable TLS verification (`verify=False`)—this plugin removed all insecure flags. A CA bundle keeps connections secure while accepting private certs.
+
+Example PEM chain (concatenate root + intermediates):
+
+```pem
+-----BEGIN CERTIFICATE-----
+<Root CA>
+-----END CERTIFICATE-----
+-----BEGIN CERTIFICATE-----
+<Intermediate CA>
+-----END CERTIFICATE-----
+```
+
+Troubleshooting:
+
+- CERTIFICATE_VERIFY_FAILED: Missing internal CA -> Add full chain to `S3_CA_BUNDLE`.
+- Hostname mismatch: Ensure endpoint URL matches certificate CN/SAN.
+- Timeouts: Network/firewall issue; test with `curl` from same environment.
+
+Security Checklist:
+
+- Minimal IAM: `s3:GetObject`, `s3:PutObject`, `s3:HeadBucket` (and multipart if needed).
+- Use presigned URLs with short expirations for sensitive objects.
+  (No public URL credential—prefer presigned URLs over broad public bucket access.)
 
 ### Example Usage (Download File)
 
-Request (LLM or workflow invocation):
+Using explicit key:
 
 ```yaml
 tool: s3_download_file
@@ -174,7 +231,15 @@ parameters:
   s3_key: "reports/2025/summary.pdf"
 ```
 
-Get temporary URL instead:
+Using filename shortcut:
+
+```yaml
+tool: s3_download_file
+parameters:
+  filename: "summary.pdf"
+```
+
+Add presigned URL (second message):
 
 ```yaml
 tool: s3_download_file
@@ -192,11 +257,31 @@ parameters:
   s3_key: "images/logo.png"
 ```
 
-Get temporary URL instead of base64:
+With presigned URL appended:
 
 ```yaml
 tool: s3_download_base64
 parameters:
+  filename: "logo.png"
+  generate_presigned_url: true
+```
+
+### Example Usage (Upload File)
+
+```yaml
+tool: s3_upload_file
+parameters:
+  filename: "summary.pdf"
+  file: <your file reference>
+  generate_presigned_url: true
+```
+
+### Example Usage (Upload Base64)
+
+```yaml
+tool: s3_upload_base64
+parameters:
   s3_key: "images/logo.png"
+  file_base64: "<base64 data>"
   generate_presigned_url: true
 ```
