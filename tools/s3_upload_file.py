@@ -5,8 +5,6 @@ from dify_plugin import Tool
 from dify_plugin.entities.tool import ToolInvokeMessage
 import boto3
 from botocore.config import Config
-import base64
-import io
 import requests
 
 class S3UploadFile(Tool):
@@ -37,7 +35,8 @@ class S3UploadFile(Tool):
             bucket_name,
             s3_key
         )
-        url = f"{self.runtime.credentials["S3_PUBLIC_URL"]}/{s3_key}"
+        public_base = self.runtime.credentials["S3_PUBLIC_URL"]
+        url = f"{public_base.rstrip('/')}/{s3_key}"
         yield self.create_text_message(url)
 
     

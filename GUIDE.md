@@ -115,3 +115,88 @@ you will get a `plugin.difypkg` file, that's all, you can submit it to the Marke
 ## User Privacy Policy
 
 Please fill in the privacy policy of the plugin if you want to make it published on the Marketplace, refer to [PRIVACY.md](PRIVACY.md) for more details.
+
+## Added S3 Download Tools
+
+This plugin now provides four S3 related tools:
+
+1. Upload (binary/file) -> `s3_upload_file`
+2. Upload (base64) -> `s3_upload_base64`
+3. Download (file) -> `s3_download_file`
+4. Download (base64) -> `s3_download_base64`
+
+### Common Credentials Required
+
+You must configure the following credentials for the provider (already defined in `provider/botos3.yaml`):
+
+- `DIFY_ENDPOINT`: Base URL of your Dify instance (used to resolve relative file URLs on upload)
+- `S3_ENDPOINT`: S3-compatible service endpoint
+- `S3_ACCESS_KEY` / `S3_SECRET_KEY`: Credentials
+- `S3_PUBLIC_URL`: Public base URL used to compose object URLs (when returning direct URL)
+- `BUCKET_NAME`: Target bucket
+
+### Download Tools Parameters
+
+Both download tools share the same parameters:
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `s3_key` | string | Yes | Object key to download |
+| `generate_presigned_url` | boolean | No | If true, returns a temporary pre-signed URL instead of content |
+| `presigned_expiration` | number | No | Expiration seconds for pre-signed URL (default 3600) |
+
+### Behavior
+
+`s3_download_file`:
+
+- If `generate_presigned_url` is true: returns a single text message containing the pre-signed URL.
+- Else: attempts to return a file message (binary). If that fails, falls back to a composed public URL.
+
+`s3_download_base64`:
+
+- If `generate_presigned_url` is true: returns a single text message containing the pre-signed URL.
+- Else: returns base64-encoded content in a text message. Warns when object size > 5MB.
+
+### Notes & Best Practices
+
+- Use `generate_presigned_url` when files are large to avoid transferring big payloads through the LLM channel.
+- Ensure `S3_PUBLIC_URL` points to a domain or CDN that can serve your bucket objects (no trailing slash needed; code handles stripping).
+- Base64 download is convenient for small assets (<1–2MB). For larger objects, prefer the file download or pre-signed URL mode.
+- The pre-signed URL uses signature version v4 with the provided expiration.
+
+### Example Usage (Download File)
+
+Request (LLM or workflow invocation):
+
+```yaml
+tool: s3_download_file
+parameters:
+  s3_key: "reports/2025/summary.pdf"
+```
+
+Get temporary URL instead:
+
+```yaml
+tool: s3_download_file
+parameters:
+  s3_key: "reports/2025/summary.pdf"
+  generate_presigned_url: true
+  presigned_expiration: 900
+```
+
+### Example Usage (Download Base64)
+
+```yaml
+tool: s3_download_base64
+parameters:
+  s3_key: "images/logo.png"
+```
+
+Get temporary URL instead of base64:
+
+```yaml
+tool: s3_download_base64
+parameters:
+  s3_key: "images/logo.png"
+  generate_presigned_url: true
+```

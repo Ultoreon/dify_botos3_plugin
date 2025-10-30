@@ -94,6 +94,8 @@ credentials_for_provider:
 tools:
   - tools/s3_upload_file.yaml
   - tools/s3_upload_base64.yaml
+  - tools/s3_download_file.yaml
+  - tools/s3_download_base64.yaml
 extra:
   python:
     source: provider/botos3.py

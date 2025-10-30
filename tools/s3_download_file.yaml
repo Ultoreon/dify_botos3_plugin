@@ -1,0 +1,48 @@
+identity:
+  name: s3_download_file
+  author: datoujiejie
+  label:
+    en_US: Download file from s3
+    zh_Hans: 从 S3 下载文件
+description:
+  human:
+    en_US: Download a file from S3 and optionally generate a temporary URL
+    zh_Hans: 从 S3 下载文件并可生成临时访问链接
+  llm: Download a file from S3 and optionally generate a temporary URL
+parameters:
+  - name: s3_key
+    type: string
+    required: true
+    label:
+      en_US: S3 Object key
+      zh_Hans: S3 对象 key
+    human_description:
+      en_US: The key of the object to download
+      zh_Hans: 要下载对象的 key
+    llm_description: S3 object key to download
+    form: llm
+  - name: generate_presigned_url
+    type: boolean
+    required: false
+    label:
+      en_US: Generate Temporary URL
+      zh_Hans: 生成临时访问链接
+    human_description:
+      en_US: If true, returns a temporary pre-signed URL instead of the file content
+      zh_Hans: 设为 true 则返回临时签名 URL 而不是文件内容
+    llm_description: Set true to return a temporary pre-signed URL
+    form: llm
+  - name: presigned_expiration
+    type: number
+    required: false
+    label:
+      en_US: Temporary URL Expiration (seconds)
+      zh_Hans: 临时链接过期时间（秒）
+    human_description:
+      en_US: Expiration time in seconds for the temporary URL (default 3600)
+      zh_Hans: 临时链接过期时间（默认 3600 秒）
+    llm_description: Expiration seconds for pre-signed URL
+    form: llm
+extra:
+  python:
+    source: tools/s3_download_file.py
