@@ -1,7 +1,7 @@
 # botos3
 
-**Author:** datoujiejie
-**Version:** 0.0.1
+**Author:** datoujiejie , Ultoreon
+**Version:** 0.0.2
 **Type:** tool
 
 # Description
@@ -49,6 +49,8 @@ If base64 comes from the sandbox, you have to adjust the value of CODE_MAX_STRIN
 
 
 Created by [datoujiejie](https://github.com/datoujiejie)
+
+Edited by [Ultoreon](https://github.com/Ultoreon)
 
 ## Repository
 
